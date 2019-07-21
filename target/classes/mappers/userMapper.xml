@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?> 
+<!DOCTYPE mapper PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN" 
+	"http://ibatis.apache.org/dtd/ibatis-3-mapper.dtd">
+<mapper namespace="org.gdpi.store.dao.UserDao">
+	<!--useGeneratedKeys主键自增; keyProperty把主键写到parameterType对应字段中 注意:如果Interface中输入的参数使用了@param("name")注解,则keyProperty参数要写成,name.属性 -->
+	<insert id="insertUser" useGeneratedKeys="true"
+		keyProperty="user.id" parameterType="org.gdpi.store.bean.User">
+		insert into
+		t_user(username,
+		password, email,
+		phone,
+		image, gender,
+		created_user,
+		created_time )
+		values
+		(#{user.userName}, #{user.password}, #{user.email},
+		#{user.phone},
+		#{user.image}, #{user.gender},
+		#{user.author.createdUser},
+		#{user.author.createdTime})
+	</insert>
+	<select id="selectUserByName" parameterType="java.lang.String"
+		resultMap="userMap">
+		select * from t_user where username=#{name};
+	</select>
+	<select id="selectUserByNameAndId" resultMap="userMap">
+		select * from
+		t_user
+		where username=#{name} and id !=#{id};
+	</select>
+	<select id="selectUserByEmail" parameterType="java.lang.String"
+		resultMap="userMap">
+		select * from t_user where email=#{email};
+	</select>
+	<select id="selectUserByEmailAndId" resultMap="userMap">
+		select * from
+		t_user where email=#{email} and id !=#{id};
+	</select>
+	<select id="selectUserByPhone" parameterType="java.lang.String"
+		resultMap="userMap">
+		select * from t_user where phone=#{phone};
+	</select>
+	<select id="selectUserByPhoneAndId" resultMap="userMap">
+		select * from
+		t_user where phone=#{phone} and id !=#{id};
+	</select>
+	<select id="selectUserById" parameterType="java.lang.Integer" resultMap="userMap">
+		select * from t_user where id=#{id};
+	</select>
+	<update id="updateUser" parameterType="org.gdpi.store.bean.User">
+		update t_user set
+		username=#{user.userName},
+		email=#{user.email},phone=#{user.phone},image=#{user.image},
+		gender=#{user.gender},modified_user=#{user.author.modifiedUser},
+		modified_time=#{user.author.modifiedTime} where id=#{user.id};
+	</update>
+	<update id="updataPassword">
+		update t_user set password=#{password} where id=#{id};
+	</update>
+	<resultMap type="org.gdpi.store.bean.User" id="userMap">
+		<id column="id" property="id" />
+		<result column="username" property="userName" />
+		<result column="password" property="password" />
+		<result column="email" property="email" />
+		<result column="phone" property="phone" />
+		<result column="image" property="image" />
+		<result column="gender" property="gender" />
+		<association property="author"
+			javaType="org.gdpi.store.bean.Author">
+			<result column="created_user" property="createdUser" />
+			<result column="created_time" property="createdTime" />
+			<result column="modified_user" property="modifiedUser" />
+			<result column="modified_time" property="modifiedTime" />
+		</association>
+
+	</resultMap>
+</mapper>

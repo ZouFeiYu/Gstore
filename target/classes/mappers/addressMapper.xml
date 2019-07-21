@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?> 
+<!DOCTYPE mapper PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN" 
+	"http://ibatis.apache.org/dtd/ibatis-3-mapper.dtd">
+<mapper namespace="org.gdpi.store.dao.AddressDao">
+	<select id="selectAllAddressByUserId" resultMap="addressMap">
+		select * from t_address
+		where user_id=#{id};
+	</select>
+	<select id="selectAddressById" resultMap="addressMap">
+		select * from t_address
+		where id=#{id};
+	</select>
+	<update id="updateAddress" parameterType="org.gdpi.store.bean.Address">
+		update t_address set 
+		user_id=#{userId},consignee=#{consignee},phone=#{phone},
+		fixed_phone=#{fixedPhone},postal_code=#{postalCode},
+		area_code=#{areaCode},citie_code=#{citieCode},province_code=#{provinceCode},
+		detailed=#{detailed},address_name=#{addressName} where id=#{id};
+	</update>
+	<update id="updateState">
+		update t_address set state=#{state} where id=#{id};
+	</update>
+	<update id="setAddrDefault">
+		update t_address set state=1 where id=#{addrId};
+		update t_address set state=0 where id!=#{addrId} and user_id=#{userId};
+	</update>
+	
+	<insert id="insertAddress" useGeneratedKeys="true"
+		keyProperty="address.id" parameterType="org.gdpi.store.bean.Address">
+		insert into t_address(
+		user_id , consignee , phone , fixed_phone , postal_code ,
+		area_code , citie_code , province_code , detailed , address_name , state)values
+		( #{address.userId} , #{address.consignee} , #{address.phone} , #{address.fixedPhone} , #{address.postalCode} , 
+		#{address.areaCode} , #{address.citieCode} ,
+		#{address.provinceCode} , #{address.detailed} , #{address.addressName} , #{address.state});
+	</insert>
+	<resultMap type="org.gdpi.store.bean.Address" id="addressMap">
+		<id column="id" property="id" />
+		<result column="user_id" property="userId" />
+		<result column="consignee" property="consignee" />
+		<result column="phone" property="phone" />
+		<result column="fixed_phone" property="fixedPhone" />
+		<result column="postal_code" property="postalCode" />
+		<result column="area_code" property="areaCode" />
+		<result column="citie_code" property="citieCode" />
+		<result column="province_code" property="provinceCode" />
+		<result column="detailed" property="detailed" />
+		<result column="address_name" property="addressName" />
+		<result column="state" property="state" />
+	</resultMap>
+</mapper>

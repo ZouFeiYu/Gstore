@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?> 
+<!DOCTYPE mapper PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN" 
+	"http://ibatis.apache.org/dtd/ibatis-3-mapper.dtd">
+<mapper namespace="org.gdpi.store.dao.GoodDao">
+	<select id="selectGoodByIdLimit" resultMap="goodMap">
+		select * from t_goods
+		where category_id in
+		(
+		select id from t_goods_category where parent_id
+		in
+		(
+		select id from t_goods_category where parent_id=#{id}
+		)
+		) order by
+		priority limit #{index},#{count};
+	</select>
+
+	<select id="selectGoodByCategoryId" resultMap="goodMap">
+		select * from
+		t_goods where category_id=#{id};
+	</select>
+
+	<select id="selectGoodLikeName" resultMap="goodMap">
+		select * from t_goods
+		where title like #{name};
+	</select>
+	<select id="selectGoodById" resultMap="goodMap">
+		select * from t_goods where id=#{id};
+	</select>
+	<select id="selectGoodByOrderId" resultMap="goodMap" parameterType="java.lang.String">
+		select * from t_goods where id in (select good_id from t_order_goods where order_id=#{orderId});
+	</select>
+	<resultMap type="org.gdpi.store.bean.Good" id="goodMap">
+		<id column="id" property="id" />
+		<result column="category_id" property="categoryId" />
+		<result column="item_type" property="itemType" />
+		<result column="title" property="title" />
+		<result column="sell_point" property="sellPoint" />
+		<result column="price" property="price" />
+		<result column="num" property="num" />
+		<result column="barcode" property="barcode" />
+		<result column="image" property="image" />
+		<result column="status" property="status" />
+		<result column="priority" property="priority" />
+		<association property="author"
+			javaType="org.gdpi.store.bean.Author">
+			<result column="created_user" property="createdUser" />
+			<result column="created_time" property="createdTime" />
+			<result column="modified_user" property="modifiedUser" />
+			<result column="modified_time" property="modifiedTime" />
+		</association>
+	</resultMap>
+</mapper>

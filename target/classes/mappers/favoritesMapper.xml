@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?> 
+<!DOCTYPE mapper PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN" 
+	"http://ibatis.apache.org/dtd/ibatis-3-mapper.dtd">
+<mapper namespace="org.gdpi.store.dao.FavoritesDao">
+	<!-- 插入一条商品记录到购物车,如果该商品已经存在,则增加其数量 -->
+	<insert id="insertGoodtoFavorites">
+		insert into
+		t_favorites(user_id,good_id)values(#{userId},#{goodId});
+	</insert>
+	<select id="selectGoodOnFavorites"
+		parameterType="java.lang.Integer"
+		resultMap="org.gdpi.store.dao.GoodDao.goodMap">
+		select * from t_goods where id in (select good_id from
+		t_favorites where user_id = #{userId});
+	</select>
+	<select id="selectGoodOnFavorites1"
+		resultMap="org.gdpi.store.dao.GoodDao.goodMap">
+		select * from t_goods where id in (select good_id from
+		t_favorites where user_id = #{userId} and good_id = #{goodId});
+	</select>
+	<delete id="deleteGoodToFavorites">
+		delete from t_favorites where user_id = #{userId} and good_id = #{goodId}
+	</delete>
+
+
+</mapper>

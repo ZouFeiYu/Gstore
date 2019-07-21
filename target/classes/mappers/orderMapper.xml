@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?> 
+<!DOCTYPE mapper PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN" 
+	"http://ibatis.apache.org/dtd/ibatis-3-mapper.dtd">
+<mapper namespace="org.gdpi.store.dao.OrderDao">
+	<!-- 插入一条商品记录到购物车,如果该商品已经存在,则增加其数量 -->
+	<select id="selectGoodInfoToOrder"
+		parameterType="java.util.List"
+		resultType="org.gdpi.store.bean.OrderForm">
+		select id, title, price, image from t_goods where id in
+		<foreach collection="list" index="index" item="item" open="("
+			separator="," close=")">
+			#{item}
+		</foreach>
+	</select>
+	<select id="selectCountOnCart" resultType="java.lang.Integer">
+		select count from
+		t_cart where user_id=#{userId} and good_id=#{goodId};
+	</select>
+	<insert id="addOrder">
+		insert into
+		t_order(order_id,user_id,address_id,status)values(#{orderId},#{userId},#{addrId},#{status});
+		insert into t_order_goods(order_id,good_id,price,count)values
+		<foreach collection="ofs" index="index" item="of" open=""
+			separator="," close="">
+			(#{orderId},#{of.id},#{of.price},#{of.count})
+		</foreach>
+	</insert>
+	<select id="selectByUserId" resultMap="oederMap">
+		select * from t_order
+		where user_id = #{userId};
+	</select>
+<update id="updateOrderStatus">
+	update t_order set status=#{status} where order_id=#{orderId};
+	</update>
+	<resultMap type="org.gdpi.store.bean.Order" id="oederMap">
+		<result column="order_id" property="orderId" />
+		<result column="status" property="status"/>
+		<association property="user" column="user_id"
+			select="org.gdpi.store.dao.UserDao.selectUserById" />
+		<association property="address" column="address_id"
+			select="org.gdpi.store.dao.AddressDao.selectAddressById" />
+		<collection property="goods" column="order_id" select="org.gdpi.store.dao.GoodDao.selectGoodByOrderId"/>
+	</resultMap>
+</mapper>
